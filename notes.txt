@@ -1,1 +1,21 @@
 race conditions: https://www.youtube.com/watch?v=FY9livorrJI&list=PLfqABt5AS4FmuQf70psXrsMLEDQXNkLq2&index=3
+
+each philo = threads
+
+eat->sleep->think
+
+n philos  = n forks
+
+forks need to be protected by mutexes!
+
+
+//1. check valid input
+//2. initialize structs, threads etc
+//3. run + monitor
+//4. free if dead or error?
+
+
+//eating ft:
+get fork/lock forks needed
+eat 
+unlock forks

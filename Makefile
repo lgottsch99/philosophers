@@ -6,7 +6,7 @@
 #    By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/18 11:25:47 by lgottsch          #+#    #+#              #
-#    Updated: 2025/03/21 15:54:34 by lgottsch         ###   ########.fr        #
+#    Updated: 2025/03/23 16:31:33 by lgottsch         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,8 @@ NAME = philo
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 SRC_FOLDER = ./src/
-SRC = $(addprefix $(SRC_FOLDER), main.c input.c utils.c free.c init.c)
+SRC = $(addprefix $(SRC_FOLDER), main.c input.c utils.c free.c init.c routine.c \
+	monitor.c )
 
 
 OBJ = $(SRC:.c=.o)

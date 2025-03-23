@@ -6,14 +6,15 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 15:23:21 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/21 17:52:03 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/23 19:39:24 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philos.h"
 
-static t_philo	*malloc_philo(int i, char *argv[], int *dead_flag)
-{printf("in malloc philo\n");
+static t_philo	*malloc_philo(int i, char *argv[], t_program *program)
+{
+	// printf("in malloc philo\n");
 	t_philo	*philo;
 
 	philo = (t_philo *)malloc(sizeof(t_philo) * 1);
@@ -23,39 +24,55 @@ static t_philo	*malloc_philo(int i, char *argv[], int *dead_flag)
 	philo->time_die = ft_atoi(argv[2]);
 	philo->time_eat = ft_atoi(argv[3]);
 	philo->time_sleep = ft_atoi(argv[4]);
-	if (argv[5])
-		philo->times_to_eat = ft_atoi(argv[5]);
-	else
-		philo->times_to_eat = -1;
-	philo->fork = 1;
+	// if (argv[5])
+	// 	philo->times_to_eat = ft_atoi(argv[5]);
+	// else
+	// 	philo->times_to_eat = -1;
+	// philo->own_fork = 1;
 	philo->dead = 0;
 	philo->times_eaten = 0;
-	philo->dead_flag = dead_flag;
+	philo->dead_flag = program->dead_flag;
+	philo->start_time = &program->start_time;
+	philo->own_fork = &program->forks[i];
+	philo->mutex_own_fork = &program->fork_mutexes[i];
+	if (i + 1 < program->num_philos)
+	{
+		philo->fork_right = &program->forks[i + 1];
+		philo->mutex_fork_right = &program->fork_mutexes[i + 1];
+	}	
+	else
+	{
+		philo->fork_right = &program->forks[0];
+		philo->mutex_fork_right = &program->fork_mutexes[0];
+	}
+	philo->end_last_meal =  program->start_time;
+	pthread_mutex_init(&philo->mutex_times_eaten, NULL); //protect
+	pthread_mutex_init(&philo->mutex_end_last_meal, NULL); //protect
+
 	return (philo);
+
 }
 
 
-static t_philo	**init_structs(char *argv[], int *dead_flag)
-{printf("in init structs\n");
+static t_philo	**init_structs(char *argv[], t_program *program)
+{
+	// printf("in init structs\n");
 	t_philo **array;
 	int		i;
-	int		num_philos;
 
 	i = 0;
-	num_philos = ft_atoi(argv[1]);
-	// printf("num philos: %i\n", num_philos);
 	//malloc space for philos
 		//malloc array of t philo * ptrs
-	array = (t_philo **)malloc (sizeof(t_philo *) * num_philos); //mlloc n philo ptrs
+	array = (t_philo **)malloc (sizeof(t_philo *) * program->num_philos); //mlloc n philo ptrs
 	if (!array)
 	{
 		printf("Malloc error\n");
 		return (NULL);
 	}
 		//malloc each philo struct
-	while (i < num_philos)
+	while (i < program->num_philos)
 	{
-		array[i] = malloc_philo(i, argv, dead_flag);
+		array[i] = malloc_philo(i, argv, program);
 		if (!array[i])
 		{
 			//free all before
@@ -64,13 +81,17 @@ static t_philo	**init_structs(char *argv[], int *dead_flag)
 			return (NULL);
 		}
 		printf("created philo no %i\n", array[i]->num);
+		print_philo(array[i]);
 		i++;
 	}
 	return (array);
 }
 
+
+
 void	init_threads(t_program *program, int num_philos)
-{printf("in init threads\n");
+{
+	printf("in init threads\n");
 	int	i;
 
 	i = 0;
@@ -80,20 +101,84 @@ void	init_threads(t_program *program, int num_philos)
 		{
 			printf("Error creating thread\n");
 			//destroy and free everything
-			return (NULL);
+			return ;
 		}
 		printf("created thread %i\n", i);
 		i++;
 	}
 }
 
-void		init_program(t_program *program, char *argv[])
+int	*init_forks(int num_philos)
 {
-	program->dead_flag = 0; //dead flag once any philo died
-	program->philos = init_structs(argv, &program->dead_flag);
+	int	*forks;
+
+	forks = NULL;
+	forks = (int *)malloc(sizeof(int) * num_philos);
+	if (!forks)
+		return (NULL);
+	memset(forks, 1, sizeof(int) * num_philos);//all forks 1
+	return (forks);
+}
+
+pthread_mutex_t	*init_fork_mutex(int num_philos)
+{
+	pthread_mutex_t *mutexes;
+	int				i;
+	//malloc space for all
+	mutexes = NULL;
+	mutexes = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * num_philos);
+	if (! mutexes)
+		return (NULL);
+	i = 0;
+	//loop and init mutex for each
+	while (i < num_philos)
+	{
+		if (pthread_mutex_init(&mutexes[i], NULL) == -1)
+		{
+			// free everything
+			return (NULL);
+		}
+		i++;
+	}
+	return (mutexes);
+}
+
+void	init_program(t_program *program, char *argv[], int *dead_flag)
+{
+	printf("init program\n");
+
+	program->num_philos = ft_atoi(argv[1]);
+	printf("num philos: %i\n", program->num_philos);
+	program->dead_flag = dead_flag; //dead flag once any philo died
+	program->start_time = get_time_ms();
+	program->forks = init_forks(program->num_philos); //all forks 
+	if (!program->forks)
+	{
+		//free and exit
+		return ;
+	}
+	program->fork_mutexes = init_fork_mutex(program->num_philos);
+	if (!program->fork_mutexes)
+	{
+		//free and exit
+		return ;
+	}
+
+	program->philos = init_structs(argv, program);
 	if (!program->philos)
 	{
 		//free and exit
 		return ;
 	}
+	if (pthread_create(&program->monitor, NULL, &monitoring, (void *)program) != 0)
+	{
+		printf("Error creating thread\n");
+		//destroy and free everything
+		return ;
+
+	}
+	if (argv[5])
+		program->times_to_eat = ft_atoi(argv[5]);
+	else
+		program->times_to_eat = -1;
 }

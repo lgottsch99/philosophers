@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 15:20:55 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/18 15:22:20 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/23 19:06:37 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,4 +35,42 @@ int	ft_atoi(const char *nptr)
 		i++;
 	}
 	return (num * neg);
+}
+
+
+long	get_time_ms()
+{
+	//try only get time of day
+	struct timeval time;
+	long	sec;
+	long	microsec;
+	long	millisec;
+
+	gettimeofday(&time, NULL);
+
+	sec = time.tv_sec;
+	microsec = time.tv_usec;
+	millisec = (sec * 1000) + (microsec / 1000);
+	// printf("start time in millisec: %ld\n", millisec);
+	return (millisec);
+}
+
+
+void	print_philo(t_philo *philo)
+{
+	printf("num: %i\n", philo->num);
+	printf("time_die: %i\n", philo->time_die);
+	printf("time_eat: %i\n", philo->time_eat);
+	printf("time_sleep: %i\n", philo->time_sleep);
+	// printf("times_to eat: %i\n", philo->times_to_eat);
+	printf("dead: %i\n", philo->dead);
+	printf("times eaten: %i\n", philo->times_eaten);
+	printf("dead flag: %i\n", *philo->dead_flag);
+	printf("start time: %ld\n", *philo->start_time);
+	printf("own fork: %p\n", (void *)philo->own_fork);
+	printf("mutex own fork: %p\n", (void *)philo->mutex_own_fork);
+
+	printf("right fork: %p\n", (void *)philo->fork_right);
+	printf("mutex right fork: %p\n", (void *)philo->mutex_fork_right);
+
 }

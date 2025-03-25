@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:14 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/23 19:35:28 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:43:12 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,10 @@ int	main(int argc, char *argv[])
 	t_program	program;
 	int			num_philos;
 	int			dead_flag;
+	int			start_flag;
 
 	dead_flag = 0;
+	start_flag = 0;
 	// program.philos = NULL;
 	//1. check valid input
 	if (check_input_valid(argc, argv) == 0)
@@ -33,13 +35,13 @@ int	main(int argc, char *argv[])
 		// 	printf("times to eat: %i\n", ft_atoi(argv[5]));
 
 	//2. initialize structs, threads etc
-		init_program(&program, argv, &dead_flag);
+		init_program(&program, argv, &dead_flag, &start_flag);
 		//TODO fork array and pass pointers to philos
 		
 		//init thread for each philo?
 		init_threads(&program, num_philos);
+		
 
-		//init mutexes
 
 
 
@@ -55,8 +57,8 @@ int	main(int argc, char *argv[])
 		//4. free if dead or error?
 
 			
-		// printf("freeing philos\n");
-		// free_philos(program.philos, num_philos - 1);
+		printf("freeing philos\n");
+		free_philos(program.philos, num_philos - 1);
 
 
 

@@ -1,5 +1,5 @@
-?????
-does simulation need to start for all philos at same time? how
+????
+
 
 
 race conditions: https://www.youtube.com/watch?v=FY9livorrJI&list=PLfqABt5AS4FmuQf70psXrsMLEDQXNkLq2&index=3

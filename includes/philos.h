@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:03 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/23 19:06:06 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:36:31 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ typedef struct s_philo
 	int				dead;//1 if philo died
 	int				times_eaten;
 	int				*dead_flag; //pointer to dead flag
-	long			*start_time; //of program
+	int				*start_flag;
+	long			start_time; //of program
 	long			end_last_meal;
 	pthread_mutex_t	*mutex_own_fork;
 	pthread_mutex_t	*mutex_fork_right;
@@ -69,7 +70,7 @@ int	check_input_valid(int argc, char *argv[]);
 // void	init_threads(t_philo **philos, int num_philos);
 void	init_threads(t_program *program, int num_philos);
 
-void	init_program(t_program *program, char *argv[], int *dead_flag);
+void	init_program(t_program *program, char *argv[], int *dead_flag, int *start_flag);
 
 //routine
 void	eat(t_philo *philo);
@@ -84,6 +85,8 @@ void	did_all_eat(t_program *program);
 int		ft_atoi(const char *nptr);
 long	get_time_ms(void);
 void	print_philo(t_philo *philo);
+void	lock_forks(t_philo *philo);
+void	unlock_forks(t_philo *philo);
 
 //free
 void	free_philos(t_philo **array, int i);

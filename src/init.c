@@ -6,13 +6,13 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/21 15:23:21 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/23 19:39:24 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:54:50 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philos.h"
 
-static t_philo	*malloc_philo(int i, char *argv[], t_program *program)
+static t_philo	*malloc_philo(int i, char *argv[], t_program *program, int *start_flag)
 {
 	// printf("in malloc philo\n");
 	t_philo	*philo;
@@ -32,7 +32,7 @@ static t_philo	*malloc_philo(int i, char *argv[], t_program *program)
 	philo->dead = 0;
 	philo->times_eaten = 0;
 	philo->dead_flag = program->dead_flag;
-	philo->start_time = &program->start_time;
+	philo->start_time = program->start_time + 1000; //3 seconds after start?
 	philo->own_fork = &program->forks[i];
 	philo->mutex_own_fork = &program->fork_mutexes[i];
 	if (i + 1 < program->num_philos)
@@ -45,7 +45,8 @@ static t_philo	*malloc_philo(int i, char *argv[], t_program *program)
 		philo->fork_right = &program->forks[0];
 		philo->mutex_fork_right = &program->fork_mutexes[0];
 	}
-	philo->end_last_meal =  program->start_time;
+	philo->end_last_meal = philo->start_time;
+	philo->start_flag = start_flag;
 	pthread_mutex_init(&philo->mutex_times_eaten, NULL); //protect
 	pthread_mutex_init(&philo->mutex_end_last_meal, NULL); //protect
 
@@ -54,7 +55,7 @@ static t_philo	*malloc_philo(int i, char *argv[], t_program *program)
 }
 
 
-static t_philo	**init_structs(char *argv[], t_program *program)
+static t_philo	**init_structs(char *argv[], t_program *program, int *start_flag)
 {
 	// printf("in init structs\n");
 	t_philo **array;
@@ -72,7 +73,7 @@ static t_philo	**init_structs(char *argv[], t_program *program)
 		//malloc each philo struct
 	while (i < program->num_philos)
 	{
-		array[i] = malloc_philo(i, argv, program);
+		array[i] = malloc_philo(i, argv, program, start_flag);
 		if (!array[i])
 		{
 			//free all before
@@ -103,7 +104,7 @@ void	init_threads(t_program *program, int num_philos)
 			//destroy and free everything
 			return ;
 		}
-		printf("created thread %i\n", i);
+		// printf("created thread %i\n", i);
 		i++;
 	}
 }
@@ -143,7 +144,7 @@ pthread_mutex_t	*init_fork_mutex(int num_philos)
 	return (mutexes);
 }
 
-void	init_program(t_program *program, char *argv[], int *dead_flag)
+void	init_program(t_program *program, char *argv[], int *dead_flag, int *start_flag)
 {
 	printf("init program\n");
 
@@ -164,7 +165,7 @@ void	init_program(t_program *program, char *argv[], int *dead_flag)
 		return ;
 	}
 
-	program->philos = init_structs(argv, program);
+	program->philos = init_structs(argv, program, start_flag);
 	if (!program->philos)
 	{
 		//free and exit
@@ -175,7 +176,6 @@ void	init_program(t_program *program, char *argv[], int *dead_flag)
 		printf("Error creating thread\n");
 		//destroy and free everything
 		return ;
-
 	}
 	if (argv[5])
 		program->times_to_eat = ft_atoi(argv[5]);

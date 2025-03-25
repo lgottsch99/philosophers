@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 16:02:06 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/23 19:22:20 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/25 18:58:35 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,19 @@
 
 void	*monitoring(void *arg)
 {
-	// printf("----MONITORING STARTET----\n");
+	printf("----MONITORING STARTET----\n");
 	t_program *program;
 
+
 	program = (t_program *)arg;
-	//constantly check if sb died
-	did_sb_die(program);
-	//smae with nr times eaten
-	//did_all_eat(program);
-	
-	//if yes stop and free program
+	//need to ckeck:
+		//sb died (time since last meal > time to die?)
+		//all ate eough?
+
+	did_sb_die(program); //OLD VERSION 
+
+
+
 
 	return (NULL);
 }
@@ -36,7 +39,7 @@ void	did_sb_die(t_program *program)
 	int		y;
 	long	time;
 
-	while (*program->dead_flag == 0)
+	while (1)//*program->dead_flag == 0)
 	{
 		//TOdo calcullations for each philo time now vs since last meal 
 		i = 0;
@@ -44,13 +47,18 @@ void	did_sb_die(t_program *program)
 		while (i < program->num_philos) //check each philo
 		{
 			time = get_time_ms();
+			pthread_mutex_lock(&(program->philos[i]->mutex_end_last_meal));
 			if (time - program->philos[i]->end_last_meal >= program->philos[i]->time_die)
 			{
 				*program->dead_flag = 1;
-				printf("%ld %i has died\n", time - *program->philos[i]->start_time, program->philos[i]->num);
+				printf("%ld %i has died\n", time - program->philos[i]->start_time, program->philos[i]->num);
 				//free stop everything
+				// pthread_mutex_unlock(&(program->philos[i]->mutex_end_last_meal));
+				printf("now exiting in monitor\n");
 				exit(0); //remove
 			}
+			pthread_mutex_unlock(&(program->philos[i]->mutex_end_last_meal));
+			
 			pthread_mutex_lock(&(program->philos[i]->mutex_times_eaten)); //todo secure
 			if (program->philos[i]->times_eaten >= program->times_to_eat)
 				y++;
@@ -60,7 +68,7 @@ void	did_sb_die(t_program *program)
 		if (y == program->num_philos)
 		{
 			// time = get_time_ms();
-			// printf("%ld all ate enough\n", time - program->start_time);
+			printf("%ld all ate enough\n", time - program->start_time);
 			*program->dead_flag = 1;
 			break;
 		}
@@ -85,7 +93,7 @@ void	did_sb_die(t_program *program)
 		// 	exit (0);
 		// }
 	}
-	exit(0);
+	// exit(0);
 }
 
 void	did_all_eat(t_program *program)

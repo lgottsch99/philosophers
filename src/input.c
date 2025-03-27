@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 14:51:55 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/23 19:29:19 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/27 17:55:38 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	check_digits(char *arg)
 ///all numeric (and > 0 except arg nr 5) args
 	//for each arg:
 		//check if only digits
-		//if yes check atoi > 0? (except last
+		//if yes check atoi > 0? (excepils.c ./src/free.c ./src/init.c ./src/routine.c ./src/monitor.c -o philo
 int	check_input_valid(int argc, char *argv[])
 {
 	int	i;
@@ -52,7 +52,7 @@ int	check_input_valid(int argc, char *argv[])
 	{
 		if (check_digits(argv[i]) == 1)
 		{
-			printf("Input invalid: only numeric args allowed!\n");
+			printf("Input invalid: only positive numeric args allowed!\n");
 			return(1);
 		}
 		if (i != 5)

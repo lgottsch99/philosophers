@@ -1,5 +1,5 @@
 ????
-
+TODO: how to stop program nicely?? (without exit)
 
 
 race conditions: https://www.youtube.com/watch?v=FY9livorrJI&list=PLfqABt5AS4FmuQf70psXrsMLEDQXNkLq2&index=3

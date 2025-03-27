@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 14:45:58 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/25 18:58:38 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:03:38 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,16 @@ void	*routine(void *arg)
 		time = get_time_ms();
 	}
 	// i = 0;
-	while (1)
+	while (philo->dead == 0)
 	{
 		// printf("start sim\n");
 		//eat for time to eat
 		eat(philo);
+		if (philo->dead == 1)
+		{
+			pthread_detach(philo->thread);
+			return (NULL);
+		}
 		//sleep for time to sleep
 		go_sleep(philo);
 		//think
@@ -45,6 +50,7 @@ void	*routine(void *arg)
 		// i++;
 	}
 	// exit(0);
+	pthread_detach(philo->thread);
 	return (NULL);
 }
 
@@ -70,12 +76,17 @@ void	eat(t_philo *philo)
 		*philo->dead_flag = 1;
 		philo->dead = 1;
 		printf("SB DIED\n");
-		exit(0);
+		// exit(0);
 		return ;
 	}
 	//grab forks and lock
 	lock_forks(philo);
 	printf("%ld %i is eating\n", time - philo->start_time, philo->num);
+
+	pthread_mutex_lock(&(philo->mutex_end_last_meal)); //reset end time bc he just startet eating
+	philo->end_last_meal = get_time_ms();
+	pthread_mutex_unlock(&(philo->mutex_end_last_meal));
+
 	usleep(philo->time_eat * 1000);
 
 	pthread_mutex_lock(&(philo->mutex_times_eaten)); //todo secure

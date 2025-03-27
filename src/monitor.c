@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/23 16:02:06 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/27 17:53:54 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:22:41 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ void	*monitoring(void *arg)
 	did_sb_die(program); //OLD VERSION 
 
 
-
-
+	pthread_detach(program->monitor);
 	return (NULL);
 }
 
@@ -61,7 +60,8 @@ void	did_sb_die(t_program *program)
 				printf("now exiting in monitor\n");
 				
 				
-				
+				pthread_detach(program->monitor);
+
 				exit(0); //remove
 			}
 			pthread_mutex_unlock(&(program->philos[i]->mutex_end_last_meal));
@@ -87,8 +87,10 @@ void	did_sb_die(t_program *program)
 				pthread_mutex_unlock(&(program->philos[u]->mutex_times_eaten)); //todo secure
 
 			}
-				exit(0);
-			// break;
+			pthread_detach(program->monitor);
+
+				exit(0); //rm
+
 		}
 		
 
@@ -111,36 +113,7 @@ void	did_sb_die(t_program *program)
 		// 	exit (0);
 		// }
 	}
-	// exit(0);
-}
 
-void	did_all_eat(t_program *program)
-{ printf("---DID ALL EAT?---\n");
-	int i;
-	int y;
-
-	if (program && program->times_to_eat != -1)
-	{
-		printf("--monitoring times to eTA---\n");
-		while (1)
-		{
-
-			i = 0;
-			y = 0;
-			//go trhu all philos and check times_eaten, if all > times_to eat dead_flag = 1
-			while (i < program->num_philos)
-			{
-				if (program->philos[i]->times_eaten < program->times_to_eat)
-					y++;
-				i++;
-			}
-			if (y == program->num_philos - 1) //all of them passed check
-			{
-				printf("all ate enough\n");
-				*program->dead_flag = 1;
-			}
-		}
-	}
 }
 
 

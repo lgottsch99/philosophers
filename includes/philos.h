@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:03 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/25 18:36:31 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:23:47 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ typedef struct s_philo
 	int				time_die;
 	int				time_eat;
 	int				time_sleep;
-	// int			times_to_eat; //-1 if not given as cl arg
 	int				*own_fork; //1 if not used and available
 	int				*fork_right;
 	int				dead;//1 if philo died
@@ -48,14 +47,10 @@ typedef struct s_program
 	int					*dead_flag;//0 if all alive, 1 once sb died
 	t_philo 			**philos;//array of ptrs to philo structs
 	long				start_time; //saving start time of prorgram in millisec
-	int					*forks;
+	int					*forks; //DONT ACTUALLY NEED THEM RMMM!!
 	pthread_mutex_t		*fork_mutexes; //as many as forks, match by index?
 	pthread_t			monitor;
 	int					times_to_eat; //-1 if not given as cl arg
-
-	// pthread_mutex_t		fork_right;
-	// pthread_mutex_t		fork_left;
-
 	
 }	t_program;
 

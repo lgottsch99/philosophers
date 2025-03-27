@@ -6,11 +6,28 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:14 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/25 18:43:12 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/27 18:23:31 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philos.h"
+
+
+
+void	join_threads(t_program *program)
+{
+	int	i;
+
+	i = 0;
+	while (i < program->num_philos)
+	{
+		pthread_join(program->philos[i]->thread, NULL);
+		i++;
+	}
+	pthread_join(program->monitor, NULL);
+	return ;
+}
+
 
 int	main(int argc, char *argv[])
 {
@@ -50,15 +67,17 @@ int	main(int argc, char *argv[])
 	//3. run + monitor
 		//simulation();//the sim. only starts once ALL threads are created!!!
 
-		for (int y = 0; y < num_philos; y++)
-		{
-			pthread_join(program.philos[y]->thread, NULL);
-		}
+		join_threads(&program);
+		// for (int y = 0; y < num_philos; y++)
+		// {
+		// 	pthread_join(program.philos[y]->thread, NULL);
+		// }
 		//4. free if dead or error?
 
-			
-		printf("freeing philos\n");
-		free_philos(program.philos, num_philos - 1);
+		printf("freeing program\n");
+		free_program(&program);
+
+		// free_philos(program.philos, num_philos - 1);
 
 
 

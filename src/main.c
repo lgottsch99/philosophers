@@ -6,84 +6,49 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:14 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/27 18:23:31 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/28 18:00:01 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philos.h"
 
 
-
-void	join_threads(t_program *program)
+void	pre_init(t_program *program)
 {
-	int	i;
-
-	i = 0;
-	while (i < program->num_philos)
-	{
-		pthread_join(program->philos[i]->thread, NULL);
-		i++;
-	}
-	pthread_join(program->monitor, NULL);
-	return ;
+	program->num_philos = 0;
+	program->dead_flag = NULL;
+	program->philos = NULL;
+	program->start_time = 0;
+	program->fork_mutexes = NULL;
+	program->times_to_eat = -1;
 }
-
 
 int	main(int argc, char *argv[])
 {
 	t_program	program;
 	int			num_philos;
 	int			dead_flag;
-	int			start_flag;
 
 	dead_flag = 0;
-	start_flag = 0;
 	// program.philos = NULL;
+	pre_init(&program);
 	//1. check valid input
 	if (check_input_valid(argc, argv) == 0)
 	{
-		printf("input valid\n");
+		// printf("input valid\n");
 		num_philos = ft_atoi(argv[1]);
-		// printf("number philos: %i\n", ft_atoi(argv[1]));
-		// printf("time to die: %i\n", ft_atoi(argv[2]));
-		// printf("time to eat: %i\n", ft_atoi(argv[3]));
-		// printf("time to sleep: %i\n", ft_atoi(argv[4]));
-		// if (argv[5])
-		// 	printf("times to eat: %i\n", ft_atoi(argv[5]));
 
 	//2. initialize structs, threads etc
-		init_program(&program, argv, &dead_flag, &start_flag);
+		init_program(&program, argv, &dead_flag);
 		//TODO fork array and pass pointers to philos
 		
 		//init thread for each philo?
 		init_threads(&program, num_philos);
 		
-
-
-
-
-
-
-	//3. run + monitor
-		//simulation();//the sim. only starts once ALL threads are created!!!
-
-		join_threads(&program);
-		// for (int y = 0; y < num_philos; y++)
-		// {
-		// 	pthread_join(program.philos[y]->thread, NULL);
-		// }
-		//4. free if dead or error?
-
-		printf("freeing program\n");
+		// join_threads(&program);
+		pthread_join(program.monitor, NULL);
+		
 		free_program(&program);
-
-		// free_philos(program.philos, num_philos - 1);
-
-
-
-
-
 	}
-	
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: lgottsch <lgottsch@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 11:23:03 by lgottsch          #+#    #+#             */
-/*   Updated: 2025/03/27 18:23:47 by lgottsch         ###   ########.fr       */
+/*   Updated: 2025/03/28 17:53:44 by lgottsch         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,17 @@ typedef struct s_philo
 	int				time_die;
 	int				time_eat;
 	int				time_sleep;
-	int				*own_fork; //1 if not used and available
-	int				*fork_right;
 	int				dead;//1 if philo died
 	int				times_eaten;
 	int				*dead_flag; //pointer to dead flag
-	int				*start_flag;
 	long			start_time; //of program
 	long			end_last_meal;
 	pthread_mutex_t	*mutex_own_fork;
 	pthread_mutex_t	*mutex_fork_right;
 	pthread_mutex_t	mutex_times_eaten; //to lock times eaten variable
 	pthread_mutex_t	mutex_end_last_meal;
-
+	pthread_mutex_t	*write_lock;
+	pthread_mutex_t	*mutex_dead_flag;
 	//...
 }	t_philo;
 
@@ -47,11 +45,13 @@ typedef struct s_program
 	int					*dead_flag;//0 if all alive, 1 once sb died
 	t_philo 			**philos;//array of ptrs to philo structs
 	long				start_time; //saving start time of prorgram in millisec
-	int					*forks; //DONT ACTUALLY NEED THEM RMMM!!
+	long				philo_start;
 	pthread_mutex_t		*fork_mutexes; //as many as forks, match by index?
+	pthread_mutex_t		write_lock;
+	pthread_mutex_t		mutex_dead_flag;
 	pthread_t			monitor;
 	int					times_to_eat; //-1 if not given as cl arg
-	
+	int					time_die;
 }	t_program;
 
 
@@ -65,7 +65,7 @@ int	check_input_valid(int argc, char *argv[]);
 // void	init_threads(t_philo **philos, int num_philos);
 void	init_threads(t_program *program, int num_philos);
 
-void	init_program(t_program *program, char *argv[], int *dead_flag, int *start_flag);
+void	init_program(t_program *program, char *argv[], int *dead_flag);
 
 //routine
 void	eat(t_philo *philo);
@@ -82,6 +82,6 @@ long	get_time_ms(void);
 void	print_philo(t_philo *philo);
 void	lock_forks(t_philo *philo);
 void	unlock_forks(t_philo *philo);
-
 //free
 void	free_philos(t_philo **array, int i);
+void	free_program(t_program *program);
